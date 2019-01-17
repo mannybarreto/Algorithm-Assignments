@@ -1,6 +1,10 @@
 package pathfinder.uninformed;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Maze Pathfinding algorithm that implements a basic, uninformed, breadth-first tree search.
@@ -19,14 +23,23 @@ public class Pathfinder {
     public static ArrayList<String> solve (MazeProblem problem) {
         // TODO: Initialize frontier -- what data structure should you use here for
         // breadth-first search? Recall: The frontier holds SearchTreeNodes!
-        
+        Queue<SearchTreeNode> frontier = new LinkedList<>();
+                
         // TODO: Add new SearchTreeNode representing the problem's initial state to the
         // frontier. Since this is the initial state, the node's action and parent will
         // be null
+        frontier.add(new SearchTreeNode(problem.INITIAL_STATE, null, null));
         
         // TODO: Loop: as long as the frontier is not empty...
+        while (!frontier.isEmpty()) {
         
             // TODO: Get the next node to expand by the ordering of breadth-first search
+            Map<String, MazeState> possibleTransitions = problem.getTransitions(frontier.peek().state);
+            
+            for (Map.Entry<String, MazeState> action : possibleTransitions.entrySet()) {
+                MazeState actionMod = action.getValue();
+                frontier.add(new SearchTreeNode(actionMod, action.getKey(), frontier.peek()));
+            }
             
             // TODO: If that node's state is the goal (see problem's isGoal method),
             // you're done! Return the solution
@@ -42,6 +55,7 @@ public class Pathfinder {
                 // TODO: ...add a new SearchTreeNode to the frontier with the appropriate
                 // action, state, and parent
         
+        }
         // Should never get here, but just return null to make the compiler happy
         return null;
     }
