@@ -10,6 +10,39 @@ import java.util.Map;
  * Maze Pathfinding algorithm that implements a basic, uninformed, breadth-first tree search.
  */
 public class Pathfinder {
+    //Expand each tree node
+	//Add cost of future and past, including future spots that include "mud"
+	//Compare the costs of multiple ways of getting to the goal
+	//???
+	//Profit
+	
+	
+	//A*
+	//would have to take into consideration the costs of its next possible moves and take the best one without accidentally missing goal state
+	
+	//ways to complete:
+	//when a goal state is found, add its path and cost of that past to a ??
+	//once all possible paths to goal are found, compare costs
+	//return path with smallest cost
+	//if no paths or cost have been added to ??, return
+	
+	//thoughts
+	//must take key in to consideration. Can we change the goal state? Start with key as goal state, once key is found, set door as goal state, and key as initial state? 2 seperate searches? one...
+	//with key as initial and door as goal, and one with initial as initial and key as goal? Best cost would be the lowest of the first search added to the lowest of the second. (not sure if this ...
+	//is A* however)
+	
+	
+	//things that need to be added:
+	//an if statement to take into consideration mud tiles (maybe)
+	//a way for the solve method to find multiple goal states (right now it stops when it finds the first possibility)
+	//a cost tracker for every path that would add cost on, and a mud tiles extra cost could be added on to as well
+	
+
+	
+	//Questions for manny:
+	// does getCost take mud tiles into consideration?
+	// thoughts on how to get to the key before the "door"?
+	// how will the solve method know when it has found all possible ways to the goal state?
     
     /**
      * Given a MazeProblem, which specifies the actions and transitions available in the
