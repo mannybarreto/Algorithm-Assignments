@@ -40,7 +40,7 @@ public class Pathfinder {
 
 	
 	//Questions for manny:
-	// does getCost take mud tiles into consideration?
+	// does getCost take mud tiles into consideration? yes
 	// thoughts on how to get to the key before the "door"?
 	// how will the solve method know when it has found all possible ways to the goal state?
     
@@ -54,8 +54,7 @@ public class Pathfinder {
      * the goal state, of the format: ["R", "R", "L", ...]
      */
     public static ArrayList<String> solve (MazeProblem problem) {
-        // [!] Note: Hyper-Commenting below for illustrative purposes; you should not have
-        // had / needed nearly as much as demonstrated below
+        boolean keyObtained = false;
         
         // Implementing BFS, so frontier is a Queue (which, in JCF, is an interface that
         // can be used atop a LinkedList implementation)
@@ -72,7 +71,7 @@ public class Pathfinder {
             SearchTreeNode expanding = frontier.poll();
             
             // If it's a goal state, we're done!
-            if (problem.isGoal(expanding.state)) {
+            if (problem.isGoal(expanding.state) && keyObtained) {
                 return getPath(expanding);
             }
             
