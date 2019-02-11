@@ -55,7 +55,7 @@ public class Pathfinder {
      * the goal state, of the format: ["R", "R", "L", ...]
      */
     public static ArrayList<String> solve (MazeProblem problem) {
-        boolean keyObtained = false;
+        boolean keyObtained = problem.KEY_STATE == null;
         
         // Implementing BFS, so frontier is a Queue (which, in JCF, is an interface that
         // can be used atop a LinkedList implementation)
@@ -71,7 +71,7 @@ public class Pathfinder {
             // Grab the front node of the queue - this is the node we're expanding
             SearchTreeNode expanding = frontier.poll();
             
-            // If it's a goal state, we're done!
+            // If it's a goal state and we obtained the key, we're done!
             if (problem.isGoal(expanding.state) && keyObtained) {
                 return getPath(expanding);
             }
