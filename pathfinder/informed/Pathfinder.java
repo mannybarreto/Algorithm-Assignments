@@ -76,6 +76,10 @@ public class Pathfinder {
                 return getPath(expanding);
             }
             
+            if (problem.isKey(expanding.state)) {
+                keyObtained = true;
+            }
+            
             // Otherwise, must generate children
             Map<String, MazeState> transitions = problem.getTransitions(expanding.state);
             // For each action:MazeState pair in the transitions...
