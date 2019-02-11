@@ -106,7 +106,15 @@ public class Pathfinder {
     
     
     private static double heuristicFunction (MazeState s) {
-        throw new UnsupportedOperationException();
+        // Pseduo Code
+	double cost = 0;
+	for(int x = 0, s != key, x++){
+		cost += getCost(s + next tile from s following path from initial to key);	
+	}  
+	for(int x = key tile, s != goal, x++){
+		cost += getCost(s + next tile from s following path from key to goal);	
+	} 
+	return cost;    
     }
 }
 
