@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
  * Maze Pathfinding algorithm that implements a basic, uninformed, breadth-first tree search.
@@ -58,10 +59,10 @@ public class Pathfinder {
         
         // Implementing BFS, so frontier is a Queue (which, in JCF, is an interface that
         // can be used atop a LinkedList implementation)
-        Queue<SearchTreeNode> frontier = new LinkedList<>();
+        PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<SearchTreeNode>();
         
         // Add initial state to frontier
-        frontier.add(new SearchTreeNode(problem.INITIAL_STATE, null, null));
+        frontier.add(new SearchTreeNode(problem.INITIAL_STATE, null, null, 0));
         
         // Continue expanding nodes as long as the frontier is not empty
         // (not strictly necessary for this assignment because a solution was
@@ -80,7 +81,7 @@ public class Pathfinder {
             // For each action:MazeState pair in the transitions...
             for (Map.Entry<String, MazeState> transition : transitions.entrySet()) {
                 // ...create a new STN and add that to the frontier
-                frontier.add(new SearchTreeNode(transition.getValue(), transition.getKey(), expanding));
+                frontier.add(new SearchTreeNode(transition.getValue(), transition.getKey(), expanding, heuristicFunction(transition.getValue())));
             }
         }
         
@@ -103,6 +104,10 @@ public class Pathfinder {
         return result;
     }
     
+    
+    private static double heuristicFunction (MazeState s) {
+        throw new UnsupportedOperationException();
+    }
 }
 
 /**
@@ -114,6 +119,7 @@ class SearchTreeNode {
     MazeState state;
     String action;
     SearchTreeNode parent;
+    double evaluation;
     
     /**
      * Constructs a new SearchTreeNode to be used in the Search Tree.
@@ -122,10 +128,20 @@ class SearchTreeNode {
      * @param action The action that *led to* this state / node.
      * @param parent Reference to parent SearchTreeNode in the Search Tree.
      */
-    SearchTreeNode (MazeState state, String action, SearchTreeNode parent) {
+    SearchTreeNode (MazeState state, String action, SearchTreeNode parent, double evaluation) {
         this.state = state;
         this.action = action;
         this.parent = parent;
+        this.evaluation = evaluation;
+    }
+    
+    public int compareTo(SearchTreeNode n) {
+        if (this.evaluation < n.evaluation){
+            return -1;
+        } else if (this.evaluation > n.evaluation){
+            return 1;
+        } else
+            return 0;
     }
     
 }
