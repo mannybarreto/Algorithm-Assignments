@@ -2,6 +2,7 @@ package pathfinder.informed;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Map;
@@ -11,40 +12,6 @@ import java.util.PriorityQueue;
  * Maze Pathfinding algorithm that implements a basic, uninformed, breadth-first tree search.
  */
 public class Pathfinder {
-    //Expand each tree node
-	//Add cost of future and past, including future spots that include "mud"
-	//Compare the costs of multiple ways of getting to the goal
-	//???
-	//Profit
-	
-	
-	//A*
-	//would have to take into consideration the costs of its next possible moves and take the best one without accidentally missing goal state
-	
-	//ways to complete:
-	//when a goal state is found, add its path and cost of that past to a ??
-	//once all possible paths to goal are found, compare costs
-	//return path with smallest cost
-	//if no paths or cost have been added to ??, return
-	
-	//thoughts
-	//must take key in to consideration. Can we change the goal state? Start with key as goal state, once key is found, set door as goal state, and key as initial state? 2 seperate searches? one...
-	//with key as initial and door as goal, and one with initial as initial and key as goal? Best cost would be the lowest of the first search added to the lowest of the second. (not sure if this ...
-	//is A* however)
-	
-	
-	//things that need to be added:
-	//an if statement to take into consideration mud tiles (maybe)
-	//a way for the solve method to find multiple goal states (right now it stops when it finds the first possibility)
-	//a cost tracker for every path that would add cost on, and a mud tiles extra cost could be added on to as well
-	
-
-	
-	//Questions for manny:
-	// does getCost take mud tiles into consideration? yes
-	// thoughts on how to get to the key before the "door"?
-	// how will the solve method know when it has found all possible ways to the goal state?
-    
     /**
      * Given a MazeProblem, which specifies the actions and transitions available in the
      * search, returns a solution to the problem as a sequence of actions that leads from
@@ -54,12 +21,19 @@ public class Pathfinder {
      * @return An ArrayList of Strings representing actions that lead from the initial to
      * the goal state, of the format: ["R", "R", "L", ...]
      */
-    public static ArrayList<String> solve (MazeProblem problem) {
-        boolean keyObtained = problem.KEY_STATE == null;
-        
-        // Implementing BFS, so frontier is a Queue (which, in JCF, is an interface that
-        // can be used atop a LinkedList implementation)
-        PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<SearchTreeNode>();
+    public static ArrayList<String> solve (MazeProblem problem) {        
+        // Implementing A*, so frontier is a PriorityQueue. Changed comparator to compare heuristic values.
+        PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<SearchTreeNode>(new Comparator<SearchTreeNode>(){
+                         //override compare method
+         public int compare(SearchTreeNode i, SearchTreeNode j){
+             if (i.evaluation < j.evaluation){
+                 return -1;
+             } else if (i.evaluation > j.evaluation){
+                 return 1;
+             } else
+                 return 0;
+             }
+         });
         
         // Add initial state to frontier
         frontier.add(new SearchTreeNode(problem.INITIAL_STATE, null, null, 0));
@@ -72,12 +46,13 @@ public class Pathfinder {
             SearchTreeNode expanding = frontier.poll();
             
             // If it's a goal state and we obtained the key, we're done!
-            if (problem.isGoal(expanding.state) && keyObtained) {
+            if (problem.isGoal(expanding.state) && problem.keyObtained) {
                 return getPath(expanding);
             }
             
             if (problem.isKey(expanding.state)) {
-                keyObtained = true;
+                problem.keyObtained = true;
+                frontier.clear();
             }
             
             // Otherwise, must generate children
@@ -85,7 +60,7 @@ public class Pathfinder {
             // For each action:MazeState pair in the transitions...
             for (Map.Entry<String, MazeState> transition : transitions.entrySet()) {
                 // ...create a new STN and add that to the frontier
-                frontier.add(new SearchTreeNode(transition.getValue(), transition.getKey(), expanding, heuristicFunction(transition.getValue())));
+                frontier.add(new SearchTreeNode(transition.getValue(), transition.getKey(), expanding, heuristicFunction(transition.getValue(), problem)));
             }
         }
         
@@ -109,15 +84,28 @@ public class Pathfinder {
     }
     
     
-    private static int heuristicFunction (MazeState s) {
-    	//issue of multiple goal states
-	//can we access goals row and column properties? is the way I did it correct?
-	int cost = getCost(s);
-	int x = abs(s.row - goal.row); 
-   	int y = abs(s.column - goal.column);
-     	return cost * (x + y);
+    private static int heuristicFunction (MazeState s, MazeProblem problem) {
+	int cost = problem.getCost(s);
+	int distance = 90000;
+	
+	if (problem.keyObtained) {
+    	for (int i = 0; i < problem.GOAL_STATES.size(); i++) { 
+    	    int x = Math.abs(s.row - problem.GOAL_STATES.get(i).row); 
+    	    int y = Math.abs(s.col - problem.GOAL_STATES.get(i).col);
+    	    if (x + y < distance) {
+    	        distance = x + y;
+    	    }
+    	}
+	} else {
+        int x = Math.abs(s.row - problem.KEY_STATE.row); 
+        int y = Math.abs(s.col - problem.KEY_STATE.col);
+	    distance =  x + y;
+	}
+    
+   	return cost * distance;
 	    //http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#S7
     }
+}
 
 /**
  * SearchTreeNode that is used in the Search algorithm to construct the Search
@@ -143,14 +131,4 @@ class SearchTreeNode {
         this.parent = parent;
         this.evaluation = evaluation;
     }
-    
-    public int compareTo(SearchTreeNode n) {
-        if (this.evaluation < n.evaluation){
-            return -1;
-        } else if (this.evaluation > n.evaluation){
-            return 1;
-        } else
-            return 0;
-    }
-    
 }

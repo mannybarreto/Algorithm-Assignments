@@ -18,6 +18,7 @@ public class MazeProblem {
     private int rows, cols;
     public final MazeState INITIAL_STATE, KEY_STATE;
     public final ArrayList<MazeState> GOAL_STATES;
+    public boolean keyObtained;
     private static final Map<String, MazeState> TRANS_MAP = createTransitions();
     
     /**
@@ -76,6 +77,7 @@ public class MazeProblem {
                 case 'K':
                     foundKey = new MazeState(col, row); break;
                 case '.':
+                case 'M':
                 case 'X':
                     break;
                 default:
@@ -86,6 +88,7 @@ public class MazeProblem {
         INITIAL_STATE = foundInitial;
         GOAL_STATES = foundGoals;
         KEY_STATE = foundKey;
+        keyObtained = foundKey == null ? true : false;
     }
     
     
