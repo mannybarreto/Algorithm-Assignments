@@ -187,6 +187,15 @@ public class MazeProblem {
         return result;
     }
     
+    /**
+     * Given a MazeState, returns the cost of moving onto that tile.
+     * 
+     * @param state A valid MazeState in maze.
+     * @return Integer corresponding to the cost to move onto that tile.
+     * '.', 'I', 'K', 'G' have a cost of 1.
+     * 'M' has a cost of 3.
+     * Throws IllegalArgumentException for walls or invalid states.
+     */
     public int getCost (MazeState state) { 
         char tile = maze[state.row].charAt(state.col);
         
