@@ -109,17 +109,15 @@ public class Pathfinder {
     }
     
     
-    private static double heuristicFunction (MazeState s) {
-        // Pseduo Code
-	for(int x = 0, s != key, x++){
-		this.evalutaion += getCost(s + next tile from s following path from initial to key);	
-	}  
-	for(int x = key tile, s != goal, x++){
-		this.evalutation += getCost(s + next tile from s following path from key to goal);	
-	} 
-	return cost;    
+    private static int heuristicFunction (MazeState s) {
+    	//issue of multiple goal states
+	//can we access goals row and column properties? is the way I did it correct?
+	int cost = getCost(s);
+	int x = abs(s.row - goal.row); 
+   	int y = abs(s.column - goal.column);
+     	return cost * (x + y);
+	    //http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#S7
     }
-}
 
 /**
  * SearchTreeNode that is used in the Search algorithm to construct the Search
