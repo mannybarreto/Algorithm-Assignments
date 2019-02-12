@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
- * Maze Pathfinding algorithm that implements a basic, uninformed, breadth-first
- * tree search.
+ * Maze Pathfinding algorithm that implements an informed A* search.
+ * 
+ * @author Manny Barreto
+ * @author Bennett Shingledecker
  */
 public class Pathfinder {
     /**
