@@ -80,7 +80,6 @@ public class PathfinderTests {
     }
     
     @Test
-
     public void testPathfinder_t4() {
 
         String[] maze = {
@@ -101,15 +100,14 @@ public class PathfinderTests {
 
     }
     @Test
-
     public void testPathfinder_t5() {
 
         String[] maze = {
             "XXXXXXX",
             "XI...GX",
-            "X.....X",
-            "X.....X",
-            "X.....X",
+            "X....MX",
+            "X....MX",
+            "X....MX",
             "XG...KX",
             "XXXXXXX"
         };

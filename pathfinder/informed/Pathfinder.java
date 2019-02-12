@@ -2,6 +2,7 @@ package pathfinder.informed;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Map;
@@ -20,56 +21,17 @@ public class Pathfinder {
      * @return An ArrayList of Strings representing actions that lead from the initial to
      * the goal state, of the format: ["R", "R", "L", ...]
      */
-    public static ArrayList<String> solve (MazeProblem problem) { 
-    	ArrayList<String> path = new ArrayList<>();
-
-        // Implementing A*, so frontier is a PriorityQueue. Changed comparator to compare heuristic values.
-        PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<SearchTreeNode>(new Comparator<SearchTreeNode>(){
-         public int compare(SearchTreeNode i, SearchTreeNode j){
-             if (i.evaluation < j.evaluation){
-                 return -1;
-             } else if (i.evaluation > j.evaluation){
-                 return 1;
-             } else
-                 return 0;
-             }
-         });
-
-        // Add initial state to frontier
-        frontier.add(new SearchTreeNode(problem.INITIAL_STATE, null, null, 0));
-       
-        // Continue expanding nodes as long as the frontier is not empty
-        // (not strictly necessary for this assignment because a solution was
-        // always assumed to be
-        
-        while (!frontier.isEmpty()) {
-            // Grab the front node of the queue - this is the node we're expanding
-            SearchTreeNode expanding = frontier.poll();
-            SearchTreeNode key = null;
-            
-            // If it's a goal state and we obtained the key, we're done!            
-            if (problem.isKey(expanding.state) && problem.keyObtained == false) {
-            	problem.keyObtained = true;
-          		path = getPath(expanding);
-          		key = expanding;
-            }
-
-            if (problem.isGoal(expanding.state) && problem.keyObtained == true) {
-            	path.addAll(twoPointPathFinder(key, expanding));
-            	return path;
-            }    
-
-            // Otherwise, must generate children
-            Map<String, MazeState> transitions = problem.getTransitions(expanding.state);
-
-            // For each action:MazeState pair in the transitions...
-            for (Map.Entry<String, MazeState> transition : transitions.entrySet()) {
-                // ...create a new STN and add that to the frontier
-                frontier.add(new SearchTreeNode(transition.getValue(), transition.getKey(), expanding, heuristicFunction(transition.getValue(), problem)));
+    public static ArrayList<String> solve (MazeProblem problem) {
+        if (problem.keyObtained) {
+            return getPath(findGoal(problem, new SearchTreeNode(problem.INITIAL_STATE, null, null, 0), problem.GOAL_STATES));
+        } else {
+            SearchTreeNode key = findGoal(problem, new SearchTreeNode(problem.INITIAL_STATE, null, null, 0), problem.KEY_STATE);
+            if (key == null) { 
+                return null;
+            } else {
+                return getPath(findGoal(problem, key, problem.GOAL_STATES));
             }
         }
-
-        return null;
     }
 
     /**
@@ -91,30 +53,67 @@ public class Pathfinder {
         return result;
     }
     
-    private static int heuristicFunction (MazeState s, MazeProblem problem) {
+    private static SearchTreeNode findGoal (MazeProblem problem, SearchTreeNode initial, HashSet<MazeState> dests) {
+        // Implementing A*, so frontier is a PriorityQueue. Changed comparator to compare heuristic values.
+        PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<SearchTreeNode>(new Comparator<SearchTreeNode>(){
+         public int compare(SearchTreeNode i, SearchTreeNode j){
+             if (i.evaluation < j.evaluation){
+                 return -1;
+             } else if (i.evaluation > j.evaluation){
+                 return 1;
+             } else
+                 return 0;
+             }
+         });
+        
+        HashSet<MazeState> graveyard = new HashSet<MazeState>();
+
+        // Add initial state to frontier
+        frontier.add(initial);
+       
+        // Continue expanding nodes as long as the frontier is not empty
+        // (not strictly necessary for this assignment because a solution was
+        // always assumed to be
+        while (!frontier.isEmpty()) {
+            // Grab the front node of the queue - this is the node we're expanding
+            SearchTreeNode expanding = frontier.poll();
+            graveyard.add(expanding.state);
+            
+            // If it's a goal state and we obtained the key, we're done!            
+            if (dests.contains(expanding.state)) {
+                return expanding;
+            } 
+            
+            // Otherwise, must generate children
+            Map<String, MazeState> transitions = problem.getTransitions(expanding.state);
+
+            // For each action:MazeState pair in the transitions...
+            for (Map.Entry<String, MazeState> transition : transitions.entrySet()) {
+                // ...create a new STN and add that to the frontier
+                if (!graveyard.contains(transition.getValue())) {
+                    frontier.add(new SearchTreeNode(transition.getValue(), transition.getKey(), expanding, heuristicFunction(transition.getValue(), problem, dests)));
+                }
+            }
+        }
+
+        return null;
+    }
+    
+    private static int heuristicFunction (MazeState s, MazeProblem problem, HashSet<MazeState> dests) {
 	int cost = problem.getCost(s);
 	int distance = 90000;
 	
-	if (problem.keyObtained) {
-    	for (int i = 0; i < problem.GOAL_STATES.size(); i++) { 
-    	    int x = Math.abs(s.row - problem.GOAL_STATES.get(i).row); 
-    	    int y = Math.abs(s.col - problem.GOAL_STATES.get(i).col);
-    	    if (x + y < distance) {
-    	        distance = x + y;
-    	    }
-    	}
-	} else {
-        int x = Math.abs(s.row - problem.KEY_STATE.row); 
-        int y = Math.abs(s.col - problem.KEY_STATE.col);
-	    distance =  x + y;
-	}
 
-    
+    for (MazeState goal : dests) { 
+        int x = Math.abs(s.row - goal.row); 
+        int y = Math.abs(s.col - goal.col);
+        if (x + y < distance) {
+            distance = x + y;
+        }
+    }
 
-   	return cost * distance;
-
+   	return cost + distance;
 	    //http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#S7
-
     }
    
     public static ArrayList<String> twoPointPathFinder(SearchTreeNode initial, SearchTreeNode goal) {

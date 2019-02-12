@@ -4,6 +4,7 @@ import java.util.Map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Specifies the Maze Grid pathfinding problem including the actions, transitions,
@@ -16,8 +17,8 @@ public class MazeProblem {
     // -----------------------------------------------------------------------------
     private String[] maze;
     private int rows, cols;
-    public final MazeState INITIAL_STATE, KEY_STATE;
-    public final ArrayList<MazeState> GOAL_STATES;
+    public final MazeState INITIAL_STATE;
+    public final HashSet<MazeState> GOAL_STATES, KEY_STATE;
     public boolean keyObtained;
     private static final Map<String, MazeState> TRANS_MAP = createTransitions();
     
@@ -62,8 +63,9 @@ public class MazeProblem {
         this.maze = maze;
         this.rows = maze.length;
         this.cols = (rows == 0) ? 0 : maze[0].length();
-        MazeState foundInitial = null, foundKey = null;
-        ArrayList<MazeState> foundGoals = new ArrayList<MazeState>();
+        MazeState foundInitial = null;
+        HashSet<MazeState> foundGoals = new HashSet<MazeState>();
+        HashSet<MazeState> foundKey = new HashSet<MazeState>();
         
         // Find the initial and goal state in the given maze, and then
         // store in fields once found
@@ -75,7 +77,7 @@ public class MazeProblem {
                 case 'G':
                     foundGoals.add(new MazeState(col, row)); break;
                 case 'K':
-                    foundKey = new MazeState(col, row); break;
+                    foundKey.add(new MazeState(col, row)); break;
                 case '.':
                 case 'M':
                 case 'X':
@@ -88,7 +90,7 @@ public class MazeProblem {
         INITIAL_STATE = foundInitial;
         GOAL_STATES = foundGoals;
         KEY_STATE = foundKey;
-        keyObtained = foundKey == null ? true : false;
+        keyObtained = foundKey.size() == 0 ? true : false;
     }
     
     
@@ -102,13 +104,7 @@ public class MazeProblem {
      * @return Boolean of whether or not the given state is a Goal.
      */
     public boolean isGoal (MazeState state) {
-        for (int i = 0; i < GOAL_STATES.size(); i++) {
-            if (state.equals(GOAL_STATES.get(i))) {
-                return true;
-            }
-        }
-        
-        return false;
+        return GOAL_STATES.contains(state);
     }
     
     /**
@@ -118,7 +114,7 @@ public class MazeProblem {
      * @return Boolean of whether or not the given state is a Key.
      */
     public boolean isKey (MazeState state) {
-        return state.equals(KEY_STATE);
+        return KEY_STATE.contains(state);
     }
     
     /**
