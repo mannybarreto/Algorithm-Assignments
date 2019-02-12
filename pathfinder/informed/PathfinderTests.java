@@ -99,6 +99,7 @@ public class PathfinderTests {
         assertEquals(14, result[1]); // Ensure that the solution is optimal
 
     }
+    
     @Test
     public void testPathfinder_t5() {
 
@@ -118,6 +119,7 @@ public class PathfinderTests {
         assertEquals(12, result[1]); 
 
     }
+    
     @Test
     public void testPathfinder_t6() {
 
@@ -137,6 +139,7 @@ public class PathfinderTests {
         assertEquals(2, result[1]); 
 
     }
+    
     @Test
     public void testPathfinder_t7() {
 
@@ -153,7 +156,7 @@ public class PathfinderTests {
         ArrayList<String> solution = Pathfinder.solve(prob);
         int[] result = prob.testSolution(solution);
         assertEquals(1, result[0]); 
-        assertEquals(16, result[1]); 
+        assertEquals(15, result[1]); 
 
     }
 

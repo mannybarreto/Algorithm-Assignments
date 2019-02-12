@@ -19,7 +19,6 @@ public class MazeProblem {
     private int rows, cols;
     public final MazeState INITIAL_STATE;
     public final HashSet<MazeState> GOAL_STATES, KEY_STATE;
-    public boolean keyObtained;
     private static final Map<String, MazeState> TRANS_MAP = createTransitions();
     
     /**
@@ -90,7 +89,10 @@ public class MazeProblem {
         INITIAL_STATE = foundInitial;
         GOAL_STATES = foundGoals;
         KEY_STATE = foundKey;
-        keyObtained = foundKey.size() == 0 ? true : false;
+        
+        if (foundKey.size() == 0) {
+            throw new IllegalArgumentException("Maze formatted invalidly");
+        }
     }
     
     
