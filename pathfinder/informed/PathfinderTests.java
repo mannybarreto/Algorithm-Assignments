@@ -118,5 +118,24 @@ public class PathfinderTests {
         assertEquals(12, result[1]); 
 
     }
+    @Test
+    public void testPathfinder_t6() {
+
+        String[] maze = {
+            "XXXXXXX",
+            "XIKGGGX",
+            "XGGGGGX",
+            "XGGGGGX",
+            "XGGGGGX",
+            "XGGGGGX",
+            "XXXXXXX"
+        };
+        MazeProblem prob = new MazeProblem(maze);
+        ArrayList<String> solution = Pathfinder.solve(prob);
+        int[] result = prob.testSolution(solution);
+        assertEquals(1, result[0]); 
+        assertEquals(2, result[1]); 
+
+    }
 
 } 
