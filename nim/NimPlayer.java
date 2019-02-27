@@ -1,6 +1,7 @@
 package nim;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,10 +23,9 @@ public class NimPlayer {
      *         range of [1, MAX_REMOVAL]
      */
     public int choose(int remaining) {
-        throw new UnsupportedOperationException();
-        // constructs a tree of options based off remaining
-        // via alpha beta, locates the best action
-        // returns that action
+        GameTreeNode node = new GameTreeNode(remaining, 0, true);
+        Map<GameTreeNode, Integer> visited = new HashMap<GameTreeNode, Integer>();
+        return alphaBetaMinimax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, true, visited);
     }
 
     /**
@@ -45,85 +45,85 @@ public class NimPlayer {
      */
     private int alphaBetaMinimax(GameTreeNode node, int alpha, int beta, boolean isMax,
             Map<GameTreeNode, Integer> visited) {
-       for (int i = 3; i > 0; i--) {
-			if (node.remaining - i >= 0) {
-				node.children.add(new GameTreeNode(node.remaining - i, i, !isMax));
-			}
-		}
-		
-		int v;
-		if (node.children.size() == 0) {
-			visited.put(node, node.score);
-			return node.score;
-		}
-		if (visited.get(node) != null) {
+        for (int i = 3; i > 0; i--) {
+            if (node.remaining - i >= 0) {
+                node.children.add(new GameTreeNode(node.remaining - i, i, !isMax));
+            }
+        }
 
-			return visited.get(node);
-		}
-		if (isMax) {
-			v = Integer.MIN_VALUE;
-			for (int i = 0; i <= node.children.size(); i++) {
-				v = Math.max(v, alphaBetaMinimax(node.children.get(i), alpha, beta, false, visited));
-				alpha = Math.max(alpha, v);
-				if (beta <= alpha) {
-					break;
-				}
-			}
-		} else {
-			v = Integer.MAX_VALUE;
-			for (int q = 0; q <= node.children.size(); q++) {
-				v = Math.min(v, alphaBetaMinimax(node.children.get(q), alpha, beta, true, visited));
-				beta = Math.min(beta, v);
-				if (beta <= alpha) {
-					break;
-				}
-			}
-		}
-		visited.put(node, v);
-		return v;
-	}
+        int v;
+        
+        if (node.children.size() == 0) {
+            visited.put(node, node.score);
+            return 0;
+        }
+        if (visited.get(node) != null) {
+            return visited.get(node);
+        }
+        
+        if (isMax) {
+            v = Integer.MIN_VALUE;
+            for (int i = 0; i < node.children.size(); i++) {
+                v = Math.max(v, alphaBetaMinimax(node.children.get(i), alpha, beta, false, visited));
+                alpha = Math.max(alpha, v);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+        } else {
+            v = Integer.MAX_VALUE;
+            for (int q = 0; q < node.children.size(); q++) {
+                v = Math.min(v, alphaBetaMinimax(node.children.get(q), alpha, beta, true, visited));
+                beta = Math.min(beta, v);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+        }
+        visited.put(node, v);
+        return v;
     }
+}
+
+/**
+ * GameTreeNode to manage the Nim game tree.
+ */
+class GameTreeNode {
+
+    int remaining, action, score;
+    boolean isMax;
+    ArrayList<GameTreeNode> children;
 
     /**
-     * GameTreeNode to manage the Nim game tree.
+     * Constructs a new GameTreeNode with the given number of stones remaining in
+     * the pile, and the action that led to it. We also initialize an empty
+     * ArrayList of children that can be added-to during search, and a placeholder
+     * score of -1 to be updated during search.
+     * 
+     * @param remaining The Nim game state represented by this node: the # of stones
+     *                  remaining in the pile
+     * @param action    The action (# of stones removed) that led to this node
+     * @param isMax     Boolean as to whether or not this is a maxnode
      */
-    class GameTreeNode {
-
-        int remaining, action, score;
-        boolean isMax;
-        ArrayList<GameTreeNode> children;
-
-        /**
-         * Constructs a new GameTreeNode with the given number of stones remaining in
-         * the pile, and the action that led to it. We also initialize an empty
-         * ArrayList of children that can be added-to during search, and a placeholder
-         * score of -1 to be updated during search.
-         * 
-         * @param remaining The Nim game state represented by this node: the # of stones
-         *                  remaining in the pile
-         * @param action    The action (# of stones removed) that led to this node
-         * @param isMax     Boolean as to whether or not this is a maxnode
-         */
-        GameTreeNode(int remaining, int action, boolean isMax) {
-            this.remaining = remaining;
-            this.action = action;
-            this.isMax = isMax;
-            children = new ArrayList<>();
-            score = -1;
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            return other instanceof GameTreeNode
-                    ? remaining == ((GameTreeNode) other).remaining && isMax == ((GameTreeNode) other).isMax
-                            && action == ((GameTreeNode) other).action
-                    : false;
-        }
-
-        @Override
-        public int hashCode() {
-            return remaining + ((isMax) ? 1 : 0);
-        }
-
+    GameTreeNode(int remaining, int action, boolean isMax) {
+        this.remaining = remaining;
+        this.action = action;
+        this.isMax = isMax;
+        children = new ArrayList<>();
+        score = -1;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof GameTreeNode
+                ? remaining == ((GameTreeNode) other).remaining && isMax == ((GameTreeNode) other).isMax
+                        && action == ((GameTreeNode) other).action
+                : false;
+    }
+
+    @Override
+    public int hashCode() {
+        return remaining + ((isMax) ? 1 : 0);
+    }
+
 }
