@@ -9,16 +9,17 @@ import java.util.PriorityQueue;
 
 /**
  * Maze Pathfinding algorithm that implements an informed A* search.
- * 
+ *
  * @author Manny Barreto
  * @author Bennett Shingledecker
+ * @author Andrew Forney
  */
 public class Pathfinder {
     /**
      * Given a MazeProblem, which specifies the actions and transitions available in
      * the search, returns a solution to the problem as a sequence of actions that
      * leads from the initial to a goal state.
-     * 
+     *
      * @param problem A MazeProblem that specifies the maze, actions, transitions.
      * @return An ArrayList of Strings representing actions that lead from the
      *         initial to the goal state, of the format: ["R", "R", "L", ...]
@@ -38,7 +39,7 @@ public class Pathfinder {
      * Given a leaf node in the search tree (a goal), returns a solution by
      * traversing up the search tree, collecting actions along the way, until
      * reaching the root
-     * 
+     *
      * @param last SearchTreeNode to start the upward traversal at (a goal node)
      * @return ArrayList sequence of actions; solution of format ["U", "R", "U",
      *         ...]
@@ -58,7 +59,7 @@ public class Pathfinder {
     /**
      * Given a problem, starting node, and destinations HashSet, finds the path to the nearest
      * destination state.
-     * 
+     *
      * @param problem MazeState problem pertaining to the maze being solved.
      * @param initial SearchTreeNode is where the search begins, keeping track of previous searches.
      * @param dests HashSet<MazeState> containing all destinations to search to, moving towards the nearest one.
@@ -103,7 +104,7 @@ public class Pathfinder {
 
     /**
      * Uses Manhattan Distance and cost to score different nodes relative to given dests for findGoals frontiers.
-     * 
+     *
      * @param s State to be analyzed heuristically.
      * @param problem MazeProblem providing the maze to be used to score nodes.
      * @param dests Destinations used to find manhattan distance.
@@ -137,7 +138,7 @@ class SearchTreeNode {
 
     /**
      * Constructs a new SearchTreeNode to be used in the Search Tree.
-     * 
+     *
      * @param state  The MazeState (row, col) that this node represents.
      * @param action The action that *led to* this state / node.
      * @param parent Reference to parent SearchTreeNode in the Search Tree.
