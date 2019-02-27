@@ -45,6 +45,7 @@ public class NimPlayer {
      */
     private int alphaBetaMinimax(GameTreeNode node, int alpha, int beta, boolean isMax,
             Map<GameTreeNode, Integer> visited) {
+        // Create children of current node.
         for (int i = 3; i > 0; i--) {
             if (node.remaining - i >= 0) {
                 node.children.add(new GameTreeNode(node.remaining - i, i, !isMax));
@@ -53,6 +54,7 @@ public class NimPlayer {
 
         int v;
         
+        // Check if terminal node or if node has been memoized/visited before.
         if (node.children.size() == 0) {
             visited.put(node, node.score);
             return 0;
@@ -63,8 +65,8 @@ public class NimPlayer {
         
         if (isMax) {
             v = Integer.MIN_VALUE;
-            for (int i = 0; i < node.children.size(); i++) {
-                v = Math.max(v, alphaBetaMinimax(node.children.get(i), alpha, beta, false, visited));
+            for (GameTreeNode child : node.children) {
+                v = Math.max(v, alphaBetaMinimax(child, alpha, beta, false, visited));
                 alpha = Math.max(alpha, v);
                 if (beta <= alpha) {
                     break;
@@ -72,8 +74,8 @@ public class NimPlayer {
             }
         } else {
             v = Integer.MAX_VALUE;
-            for (int q = 0; q < node.children.size(); q++) {
-                v = Math.min(v, alphaBetaMinimax(node.children.get(q), alpha, beta, true, visited));
+            for (GameTreeNode child : node.children) {
+                v = Math.min(v, alphaBetaMinimax(child, alpha, beta, true, visited));
                 beta = Math.min(beta, v);
                 if (beta <= alpha) {
                     break;
