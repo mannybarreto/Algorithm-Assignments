@@ -45,37 +45,43 @@ public class NimPlayer {
      */
     private int alphaBetaMinimax(GameTreeNode node, int alpha, int beta, boolean isMax,
             Map<GameTreeNode, Integer> visited) {
-        int v;
-        if (node.children.size() == 0) {
-            visited.put(node, node.score);
-            return node.score;
-        }
+       for (int i = 3; i > 0; i--) {
+			if (node.remaining - i >= 0) {
+				node.children.add(new GameTreeNode(node.remaining - i, i, !isMax));
+			}
+		}
+		
+		int v;
+		if (node.children.size() == 0) {
+			visited.put(node, node.score);
+			return node.score;
+		}
+		if (visited.get(node) != null) {
 
-        if (visited.get(node) != null) {
-            return visited.get(node);
-        }
-
-        if (isMax) {
-            v = Integer.MIN_VALUE;
-            for (int i = 0; i <= node.children.size(); i++) {
-                v = Math.max(v, alphaBetaMinimax(node.children.get(i), alpha, beta, false, visited));
-                alpha = Math.max(alpha, v);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-        } else {
-            v = Integer.MAX_VALUE;
-            for (int q = 0; q <= node.children.size(); q++) {
-                v = Math.min(v, alphaBetaMinimax(node.children.get(q), alpha, beta, true, visited));
-                beta = Math.min(beta, v);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-        }
-        visited.put(node, v);
-        return v;
+			return visited.get(node);
+		}
+		if (isMax) {
+			v = Integer.MIN_VALUE;
+			for (int i = 0; i <= node.children.size(); i++) {
+				v = Math.max(v, alphaBetaMinimax(node.children.get(i), alpha, beta, false, visited));
+				alpha = Math.max(alpha, v);
+				if (beta <= alpha) {
+					break;
+				}
+			}
+		} else {
+			v = Integer.MAX_VALUE;
+			for (int q = 0; q <= node.children.size(); q++) {
+				v = Math.min(v, alphaBetaMinimax(node.children.get(q), alpha, beta, true, visited));
+				beta = Math.min(beta, v);
+				if (beta <= alpha) {
+					break;
+				}
+			}
+		}
+		visited.put(node, v);
+		return v;
+	}
     }
 
     /**
