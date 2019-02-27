@@ -50,6 +50,11 @@ public class NimPlayer {
             visited.put(node, node.score);
             return node.score;
         }
+
+        if (visited.get(node) != null) {
+            return visited.get(node);
+        }
+
         if (isMax) {
             v = Integer.MIN_VALUE;
             for (int i = 0; i <= node.children.size(); i++) {
@@ -73,45 +78,46 @@ public class NimPlayer {
         return v;
     }
 
-/**
- * GameTreeNode to manage the Nim game tree.
- */
-class GameTreeNode {
-
-    int remaining, action, score;
-    boolean isMax;
-    ArrayList<GameTreeNode> children;
-
     /**
-     * Constructs a new GameTreeNode with the given number of stones remaining in
-     * the pile, and the action that led to it. We also initialize an empty
-     * ArrayList of children that can be added-to during search, and a placeholder
-     * score of -1 to be updated during search.
-     * 
-     * @param remaining The Nim game state represented by this node: the # of stones
-     *                  remaining in the pile
-     * @param action    The action (# of stones removed) that led to this node
-     * @param isMax     Boolean as to whether or not this is a maxnode
+     * GameTreeNode to manage the Nim game tree.
      */
-    GameTreeNode(int remaining, int action, boolean isMax) {
-        this.remaining = remaining;
-        this.action = action;
-        this.isMax = isMax;
-        children = new ArrayList<>();
-        score = -1;
-    }
+    class GameTreeNode {
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof GameTreeNode
-                ? remaining == ((GameTreeNode) other).remaining && isMax == ((GameTreeNode) other).isMax
-                        && action == ((GameTreeNode) other).action
-                : false;
-    }
+        int remaining, action, score;
+        boolean isMax;
+        ArrayList<GameTreeNode> children;
 
-    @Override
-    public int hashCode() {
-        return remaining + ((isMax) ? 1 : 0);
-    }
+        /**
+         * Constructs a new GameTreeNode with the given number of stones remaining in
+         * the pile, and the action that led to it. We also initialize an empty
+         * ArrayList of children that can be added-to during search, and a placeholder
+         * score of -1 to be updated during search.
+         * 
+         * @param remaining The Nim game state represented by this node: the # of stones
+         *                  remaining in the pile
+         * @param action    The action (# of stones removed) that led to this node
+         * @param isMax     Boolean as to whether or not this is a maxnode
+         */
+        GameTreeNode(int remaining, int action, boolean isMax) {
+            this.remaining = remaining;
+            this.action = action;
+            this.isMax = isMax;
+            children = new ArrayList<>();
+            score = -1;
+        }
 
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof GameTreeNode
+                    ? remaining == ((GameTreeNode) other).remaining && isMax == ((GameTreeNode) other).isMax
+                            && action == ((GameTreeNode) other).action
+                    : false;
+        }
+
+        @Override
+        public int hashCode() {
+            return remaining + ((isMax) ? 1 : 0);
+        }
+
+    }
 }
