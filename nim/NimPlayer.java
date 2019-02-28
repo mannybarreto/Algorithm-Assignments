@@ -23,9 +23,15 @@ public class NimPlayer {
      *         range of [1, MAX_REMOVAL]
      */
     public int choose(int remaining) {
-        GameTreeNode node = new GameTreeNode(remaining, 0, true);
+        GameTreeNode root = new GameTreeNode(remaining, 0, true);
         Map<GameTreeNode, Integer> visited = new HashMap<GameTreeNode, Integer>();
-        return alphaBetaMinimax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, true, visited);
+        root.score = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, visited);
+        for(GameTreeNode kid : root.children) {
+        	if (kid.score == root.score) {
+        		return kid.action;
+        	}
+        }
+        return 1;
     }
 
     /**
@@ -55,6 +61,8 @@ public class NimPlayer {
         int v;
         
         // Check if terminal node or if node has been memoized/visited before.
+        // TO BREAK THE RECURSION, YOU WANT AN IF STATEMENT CHECKING IF THE REMAINING FOR THE CURRENT NODE
+        // THAT YOU ARE PASSING IN IS 0; IF IT'S A MAX, THEN YOU WOULD RETURN 0 OTHERWISE RETURN 1
         if (node.children.size() == 0) {
             visited.put(node, node.score);
             return 0;
@@ -65,6 +73,15 @@ public class NimPlayer {
         
         if (isMax) {
             v = Integer.MIN_VALUE;
+            // SINCE WE ARE NOT SURE WHETHER OR NOT THE CHILD NODE IN QUESTION IS ALREADY IN VISITED, 
+            // AND WE ALSO DON'T KNOW IF ALPHA BETA MINIMAX WILL MEAN YOU HAVE TO PRUNE ANY OF THE CHILDREN
+            // IT'S NOT SMART TO CREATE THE KIDS ON SIGHT
+            // INSTEAD YOUR FOR LOOP SHOULD START AT 1 FOR THE ACTION, STOP AT THE MINIMUM OF THE MAX_REMOVAL AND THE REMAINING 
+            // 1) MAKE KID 
+            // 2) CHECK IF IT IS ALREADY IN THE VISITED
+            		// IF ALREADY IN VISITED THEN YOU JUST SET V TO THE MAX/MIN OF V AND THE SCORE OF THE NODE THAT ALREADY EXISTS IN VISITED TO HANDLE MEMOIZATION
+            		// OTHERWISE, SET THE V TO THE RECURSIVE CALL TO THE MAX/MIN OF THE V AND THE RECURSIVE CALL 
+            //ALPHA/BETA IS INE AS IS JUST RETURN V AFTER EVERY CONDITION 
             for (GameTreeNode child : node.children) {
                 v = Math.max(v, alphaBetaMinimax(child, alpha, beta, false, visited));
                 alpha = Math.max(alpha, v);
