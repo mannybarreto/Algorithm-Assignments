@@ -56,19 +56,21 @@ public class NimPlayer {
         
         if (node.remaining <= 0) {
             visited.put(node, node.score);
+            node.score = isMax ? 0 : 1;
             return isMax ? 0 : 1;
         }
         
         if (isMax) {
             int score = Integer.MIN_VALUE;
             
-            for (int i = 1; i < MAX_REMOVAL; i++) {
+            for (int i = 1; i <= MAX_REMOVAL; i++) {
                 GameTreeNode newChild = new GameTreeNode(node.remaining - i, i, !isMax);
                 node.children.add(newChild);
                 if (visited.get(newChild) != null) {
                     score = Math.max(score, visited.get(newChild));
                 } else {
-                    score = alphaBetaMinimax(newChild, alpha, beta, false, visited);
+                    alphaBetaMinimax(newChild, alpha, beta, false, visited);
+                    score = Math.max(score, newChild.score);
                     visited.put(newChild, score);
                 }
                 alpha = Math.max(alpha, score);
@@ -82,13 +84,14 @@ public class NimPlayer {
         } else {
             int score = Integer.MAX_VALUE;
             
-            for (int i = 1; i < MAX_REMOVAL; i++) {
+            for (int i = 1; i <= MAX_REMOVAL; i++) {
                 GameTreeNode newChild = new GameTreeNode(node.remaining - i, i, !isMax);
                 node.children.add(newChild);
                 if (visited.get(newChild) != null) {
                     score = Math.min(score, visited.get(newChild));
                 } else {
-                    score = Math.min(score, alphaBetaMinimax(newChild, alpha, beta, true, visited));
+                    alphaBetaMinimax(newChild, alpha, beta, true, visited);
+                    score = Math.min(score, newChild.score);
                     visited.put(newChild, score);
                 }
                 beta = Math.min(beta, score);
