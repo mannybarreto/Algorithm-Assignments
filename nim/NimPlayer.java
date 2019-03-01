@@ -68,7 +68,7 @@ public class NimPlayer {
                 if (visited.get(newChild) != null) {
                     score = Math.max(score, visited.get(newChild));
                 } else {
-                    score = alphaBetaMinimax(newChild, alpha, beta, false, visited));
+                    score = alphaBetaMinimax(newChild, alpha, beta, false, visited);
                     visited.put(newChild, score);
                 }
                 alpha = Math.max(alpha, score);
