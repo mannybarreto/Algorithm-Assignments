@@ -26,11 +26,13 @@ public class NimPlayer {
         GameTreeNode root = new GameTreeNode(remaining, 0, true);
         Map<GameTreeNode, Integer> visited = new HashMap<GameTreeNode, Integer>();
         root.score = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, visited);
-        for(GameTreeNode kid : root.children) {
-        	if (kid.score == root.score) {
-        		return kid.action;
+        
+        for(GameTreeNode child : root.children) {
+        	if (child.score == root.score) {
+        		return child.action;
         	}
         }
+        
         return 1;
     }
 
@@ -51,56 +53,53 @@ public class NimPlayer {
      */
     private int alphaBetaMinimax(GameTreeNode node, int alpha, int beta, boolean isMax,
             Map<GameTreeNode, Integer> visited) {
-        // Create children of current node.
-        for (int i = 3; i > 0; i--) {
-            if (node.remaining - i >= 0) {
-                node.children.add(new GameTreeNode(node.remaining - i, i, !isMax));
-            }
-        }
-
-        int v;
         
-        // Check if terminal node or if node has been memoized/visited before.
-        // TO BREAK THE RECURSION, YOU WANT AN IF STATEMENT CHECKING IF THE REMAINING FOR THE CURRENT NODE
-        // THAT YOU ARE PASSING IN IS 0; IF IT'S A MAX, THEN YOU WOULD RETURN 0 OTHERWISE RETURN 1
-        if (node.children.size() == 0) {
+        if (node.remaining <= 0) {
             visited.put(node, node.score);
-            return 0;
-        }
-        if (visited.get(node) != null) {
-            return visited.get(node);
+            return isMax ? 0 : 1;
         }
         
         if (isMax) {
-            v = Integer.MIN_VALUE;
-            // SINCE WE ARE NOT SURE WHETHER OR NOT THE CHILD NODE IN QUESTION IS ALREADY IN VISITED, 
-            // AND WE ALSO DON'T KNOW IF ALPHA BETA MINIMAX WILL MEAN YOU HAVE TO PRUNE ANY OF THE CHILDREN
-            // IT'S NOT SMART TO CREATE THE KIDS ON SIGHT
-            // INSTEAD YOUR FOR LOOP SHOULD START AT 1 FOR THE ACTION, STOP AT THE MINIMUM OF THE MAX_REMOVAL AND THE REMAINING 
-            // 1) MAKE KID 
-            // 2) CHECK IF IT IS ALREADY IN THE VISITED
-            		// IF ALREADY IN VISITED THEN YOU JUST SET V TO THE MAX/MIN OF V AND THE SCORE OF THE NODE THAT ALREADY EXISTS IN VISITED TO HANDLE MEMOIZATION
-            		// OTHERWISE, SET THE V TO THE RECURSIVE CALL TO THE MAX/MIN OF THE V AND THE RECURSIVE CALL 
-            //ALPHA/BETA IS INE AS IS JUST RETURN V AFTER EVERY CONDITION 
-            for (GameTreeNode child : node.children) {
-                v = Math.max(v, alphaBetaMinimax(child, alpha, beta, false, visited));
-                alpha = Math.max(alpha, v);
+            int score = Integer.MIN_VALUE;
+            
+            for (int i = 1; i < MAX_REMOVAL; i++) {
+                GameTreeNode newChild = new GameTreeNode(node.remaining - i, i, !isMax);
+                node.children.add(newChild);
+                if (visited.get(newChild) != null) {
+                    score = Math.max(score, visited.get(newChild));
+                } else {
+                    score = alphaBetaMinimax(newChild, alpha, beta, false, visited));
+                    visited.put(newChild, score);
+                }
+                alpha = Math.max(alpha, score);
                 if (beta <= alpha) {
                     break;
                 }
             }
+            
+            node.score = score;
+            return score; 
         } else {
-            v = Integer.MAX_VALUE;
-            for (GameTreeNode child : node.children) {
-                v = Math.min(v, alphaBetaMinimax(child, alpha, beta, true, visited));
-                beta = Math.min(beta, v);
+            int score = Integer.MAX_VALUE;
+            
+            for (int i = 1; i < MAX_REMOVAL; i++) {
+                GameTreeNode newChild = new GameTreeNode(node.remaining - i, i, !isMax);
+                node.children.add(newChild);
+                if (visited.get(newChild) != null) {
+                    score = Math.min(score, visited.get(newChild));
+                } else {
+                    score = Math.min(score, alphaBetaMinimax(newChild, alpha, beta, true, visited));
+                    visited.put(newChild, score);
+                }
+                beta = Math.min(beta, score);
                 if (beta <= alpha) {
                     break;
                 }
             }
-        }
-        visited.put(node, v);
-        return v;
+            
+            node.score = score;
+            return score; 
+        }        
     }
 }
 
