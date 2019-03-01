@@ -53,19 +53,21 @@ public class NimPlayer {
      */
     private int alphaBetaMinimax(GameTreeNode node, int alpha, int beta, boolean isMax,
             Map<GameTreeNode, Integer> visited) {
+        int score;
         
         if (node.remaining <= 0) {
             visited.put(node, node.score);
             node.score = isMax ? 0 : 1;
-            return isMax ? 0 : 1;
+            return node.score;
         }
         
         if (isMax) {
-            int score = Integer.MIN_VALUE;
+            score = Integer.MIN_VALUE;
             
             for (int i = 1; i <= MAX_REMOVAL; i++) {
                 GameTreeNode newChild = new GameTreeNode(node.remaining - i, i, !isMax);
                 node.children.add(newChild);
+                
                 if (visited.get(newChild) != null) {
                     score = Math.max(score, visited.get(newChild));
                 } else {
@@ -73,20 +75,19 @@ public class NimPlayer {
                     score = Math.max(score, newChild.score);
                     visited.put(newChild, score);
                 }
+                
                 alpha = Math.max(alpha, score);
                 if (beta <= alpha) {
                     break;
                 }
             }
-            
-            node.score = score;
-            return score; 
         } else {
-            int score = Integer.MAX_VALUE;
+            score = Integer.MAX_VALUE;
             
             for (int i = 1; i <= MAX_REMOVAL; i++) {
                 GameTreeNode newChild = new GameTreeNode(node.remaining - i, i, !isMax);
                 node.children.add(newChild);
+                
                 if (visited.get(newChild) != null) {
                     score = Math.min(score, visited.get(newChild));
                 } else {
@@ -94,15 +95,16 @@ public class NimPlayer {
                     score = Math.min(score, newChild.score);
                     visited.put(newChild, score);
                 }
+                
                 beta = Math.min(beta, score);
                 if (beta <= alpha) {
                     break;
                 }
             }
-            
-            node.score = score;
-            return score; 
-        }        
+        }
+        
+        node.score = score;
+        return score; 
     }
 }
 
