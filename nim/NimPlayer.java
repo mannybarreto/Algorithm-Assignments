@@ -7,6 +7,10 @@ import java.util.Map;
 /**
  * Artificial Intelligence responsible for playing the game of Nim! Implements
  * the alpha-beta-pruning mini-max search algorithm
+ * 
+ * @author Manny Barreto
+ * @author Bennett Shingledecker
+ * @author Andrew Forney
  */
 public class NimPlayer {
 
@@ -77,9 +81,7 @@ public class NimPlayer {
                 }
                 
                 alpha = Math.max(alpha, score);
-                if (beta <= alpha) {
-                    break;
-                }
+                if (beta <= alpha) { break; }
             }
         } else {
             score = Integer.MAX_VALUE;
@@ -97,9 +99,7 @@ public class NimPlayer {
                 }
                 
                 beta = Math.min(beta, score);
-                if (beta <= alpha) {
-                    break;
-                }
+                if (beta <= alpha) { break; }
             }
         }
         
