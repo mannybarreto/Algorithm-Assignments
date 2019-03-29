@@ -121,13 +121,32 @@ public class LCS {
      *         sets memoCheck to refer to table
      */
     public static Set<String> topDownLCS(String rStr, String cStr) {
-
-        throw new UnsupportedOperationException();
-        // Set<String> result;
-        // memoCheck = new int[rStr.length()][cStr.length()];
-        // return collectSolution(rStr, 0, cStr, 0);
+    	 Set<String> result = new HashSet<String>();
+         result.add("");
+         if (rStr.length() == 0 || cStr.length() == 0) {
+             return result;
+         }
+    	boolean[][] haveVisited = new boolean[rStr.length() + 1][cStr.length() + 1];
+    	memoCheck = new int[rStr.length() + 1][cStr.length() + 1];
+    	fillTDTable(memoCheck, haveVisited,rStr, rStr.length(), cStr, cStr.length());
+    	result = collectSolution(rStr, rStr.length(), cStr, cStr.length(), result);
+    	return result;
     }
-
-    // [!] TODO: Add any top-down specific helpers here!
+    
+    public static int fillTDTable(int[][] table, boolean[][] haveVisited, String rStr, int row, String cStr, int column) {
+    	if(row == 0 || column == 0) {
+    		return 0;
+    	}
+    	if(haveVisited[row][column] == true) {
+    		return table[row][column];
+    	} else if(rStr.charAt(row - 1) == cStr.charAt(column - 1)) {
+    		haveVisited[row][column] = true;
+    		table[row][column] = 1 + fillTDTable(table, haveVisited, rStr, row -1, cStr, column -1);
+    	} else {
+    		haveVisited[row][column] = true;
+    		table[row][column] = Math.max(fillTDTable(table, haveVisited, rStr, row -1, cStr, column), fillTDTable(table, haveVisited, rStr, row, cStr, column -1));
+    	}
+    		return table[row][column];
+    }
 
 }
