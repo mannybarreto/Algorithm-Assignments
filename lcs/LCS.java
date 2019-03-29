@@ -17,36 +17,43 @@ public class LCS {
     // -----------------------------------------------
 
     // [!] TODO: Add your shared helper methods here!
-    public static Set<String> collectSolution (String rStr, int row, String cStr, int col, Set<String> result){        
-        char rLetter = rStr.charAt(row - 2),
-             cLetter = cStr.charAt(col - 2);
-
+    public static Set<String> collectSolution(String rStr, int row, String cStr, int col, Set<String> result) {
         if (row == 0 || col == 0) {
-            result.add("");
             return result;
         }
 
-        if (rLetter != cLetter) {
-            if (memoCheck[row][col] > memoCheck[row - 1][col] && memoCheck[row][col] > memoCheck[row][col - 1]) {
-                result.add(rStr.substring(row - 1));
-                collectSolution(rStr, row - 1, cStr, col - 1, result);
-            }
+        char rLetter = rStr.charAt(row - 1), cLetter = cStr.charAt(col - 1);
+
+        if (rLetter == cLetter) {
+            result = addLetter(Character.toString(cLetter), collectSolution(rStr, row - 1, cStr, col - 1, result));
+            return result;
         } else {
-            if (memoCheck[row][col] == memoCheck[row - 1][col]) {
-                collectSolution(rStr, row - 1, cStr, col, result);
+            Set<String> leftResult = new HashSet<String>();
+            Set<String> upResult = new HashSet<String>();
+            if (memoCheck[row][col] >= memoCheck[row - 1][col]) {
+                leftResult.addAll(collectSolution(rStr, row - 1, cStr, col, result));
             }
 
-            else if (memoCheck[row][col] == memoCheck[row][col - 1]) {
-                collectSolution(rStr, row, cStr, col - 1, result);
+            if (memoCheck[row][col] >= memoCheck[row][col - 1]) {
+                upResult.addAll(collectSolution(rStr, row, cStr, col - 1, result));
             }
+            leftResult.addAll(upResult);
+            return leftResult;
         }
-
-        return result;
     }
     
-    public static void createMemo (String rStr, String cStr) {
-        memoCheck = new int[rStr.length() + 1][cStr.length() + 1];
+    public static Set<String> addLetter(String letter, Set<String> collected) {
+        HashSet<String> result = new HashSet<String>();
+        for (String s : collected) {
+            result.add(s + letter);
+        }
         
+        return result;
+    }
+
+    public static void createMemo(String rStr, String cStr) {
+        memoCheck = new int[rStr.length() + 1][cStr.length() + 1];
+
         for (int i = 0; i < rStr.length() + 1; i++) {
             memoCheck[i][0] = 0;
         }
@@ -72,23 +79,24 @@ public class LCS {
      */
     public static Set<String> bottomUpLCS(String rStr, String cStr) {
         Set<String> result = new HashSet<String>();
-        
+        result.add("");
         if (rStr.length() == 0 || cStr.length() == 0) {
-            result.add("");
             return result;
         }
-        
+
         createMemo(rStr, cStr);
         evaluateCellsBottomUp(rStr, cStr);
-        return collectSolution(rStr, rStr.length() + 1, cStr, cStr.length() + 1, result);
+        result = collectSolution(rStr, rStr.length(), cStr, cStr.length(), result);
+
+
+        return result;
     }
 
     // [!] TODO: Add any bottom-up specific helpers here!
-    public static void evaluateCellsBottomUp(String rStr, String cStr) {        
-        for (int col = 1; col < rStr.length() + 1; col ++) {
+    public static void evaluateCellsBottomUp(String rStr, String cStr) {
+        for (int col = 1; col < rStr.length() + 1; col++) {
             for (int row = 1; row < cStr.length() + 1; row++) {
-                char rLetter = rStr.charAt(row - 1),
-                     cLetter = cStr.charAt(col - 1);
+                char rLetter = rStr.charAt(row - 1), cLetter = cStr.charAt(col - 1);
                 if (rLetter != cLetter) {
                     memoCheck[row][col] = Math.max(memoCheck[row - 1][col], memoCheck[row][col - 1]);
                 } else {
