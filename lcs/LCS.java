@@ -22,7 +22,8 @@ public class LCS {
             return result;
         }
 
-        char rLetter = rStr.charAt(row - 1), cLetter = cStr.charAt(col - 1);
+        char rLetter = rStr.charAt(row - 1), 
+             cLetter = cStr.charAt(col - 1);
 
         if (rLetter == cLetter) {
             result = addLetter(Character.toString(cLetter), collectSolution(rStr, row - 1, cStr, col - 1, result));
@@ -37,6 +38,7 @@ public class LCS {
             if (memoCheck[row][col] >= memoCheck[row][col - 1]) {
                 upResult.addAll(collectSolution(rStr, row, cStr, col - 1, result));
             }
+            
             leftResult.addAll(upResult);
             return leftResult;
         }
@@ -123,9 +125,11 @@ public class LCS {
     public static Set<String> topDownLCS(String rStr, String cStr) {
     	 Set<String> result = new HashSet<String>();
          result.add("");
+         
          if (rStr.length() == 0 || cStr.length() == 0) {
              return result;
          }
+         
     	boolean[][] haveVisited = new boolean[rStr.length() + 1][cStr.length() + 1];
     	memoCheck = new int[rStr.length() + 1][cStr.length() + 1];
     	fillTDTable(memoCheck, haveVisited,rStr, rStr.length(), cStr, cStr.length());
@@ -134,12 +138,12 @@ public class LCS {
     }
     
     public static int fillTDTable(int[][] table, boolean[][] haveVisited, String rStr, int row, String cStr, int column) {
-    	if(row == 0 || column == 0) {
+    	if (row == 0 || column == 0) {
     		return 0;
     	}
-    	if(haveVisited[row][column] == true) {
+    	if (haveVisited[row][column] == true) {
     		return table[row][column];
-    	} else if(rStr.charAt(row - 1) == cStr.charAt(column - 1)) {
+    	} else if (rStr.charAt(row - 1) == cStr.charAt(column - 1)) {
     		haveVisited[row][column] = true;
     		table[row][column] = 1 + fillTDTable(table, haveVisited, rStr, row -1, cStr, column -1);
     	} else {
