@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Huffman instances provide reusable Huffman Encoding Maps for
@@ -50,34 +51,35 @@ public class Huffman {
      *         0-padding on the final byte.
      */
     public byte[] compress (String message) {
-        byte[] result = new byte[2];
-        result[0] = (byte) message.length();
-
         PriorityQueue<HuffNode> queue = createPriorityQueue(message);
         constructTrie(queue);
 
         HashMap<Character, String> encoding = new HashMap<Character, String>();
         encodingMap = retrieveEncoding(encoding, trieRoot, "");
-        String encoded = "";
+        
+        String encodedString = "";
         
         for (int i = 0; i < message.length(); i++) {
-            encoded = encoded + encodingMap.get(message.charAt(i));
+            encodedString = encodedString + encodingMap.get(message.charAt(i));
         }
         
         int padding = 0;
-        while (encoded.length() % 4 != 0) {
-            encoded = encoded + "0";
+        while (encodedString.length() % 8 != 0) {
+            encodedString = encodedString + "0";
             padding++;
         }
+                
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(); 
+        bout.write(Integer.parseInt(encodedString, 2));
         
-        result[1] = Byte.parseByte(encoded,2);
+        byte[] encoded = bout.toByteArray();
         
-        if (padding > 0) {
-            byte[] temp = result;
-            result = new byte[3];
-            result[0] = temp[0];
-            result[1] = temp[1];
-            result[2] = (byte)padding;
+        byte[] result = new byte[1 + encoded.length];
+        
+        result[0] = (byte) message.length();
+        
+        for (int i = 0; i < encoded.length; i++) {
+            result[1 + i] = encoded[i];
         }
         
         return result;
