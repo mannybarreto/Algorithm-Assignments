@@ -31,7 +31,9 @@ public class Huffman {
      *        differ.
      */
     Huffman (String corpus) {
-        // TODO!
+        PriorityQueue<HuffNode> queue = createPriorityQueue(corpus);
+        constructTrie(queue);
+        encodingMap = retrieveEncoding(new HashMap<Character, String>() , trieRoot, "");
     }
     
     
@@ -51,22 +53,15 @@ public class Huffman {
      *         0-padding on the final byte.
      */
     public byte[] compress (String message) {
-        PriorityQueue<HuffNode> queue = createPriorityQueue(message);
-        constructTrie(queue);
-
-        HashMap<Character, String> encoding = new HashMap<Character, String>();
-        encodingMap = retrieveEncoding(encoding, trieRoot, "");
-        
         String encodedString = "";
         
         for (int i = 0; i < message.length(); i++) {
             encodedString = encodedString + encodingMap.get(message.charAt(i));
         }
         
-        int padding = 0;
+        // TODO: Switch to bitshift <<
         while (encodedString.length() % 8 != 0) {
             encodedString = encodedString + "0";
-            padding++;
         }
                 
         ByteArrayOutputStream bout = new ByteArrayOutputStream(); 
@@ -75,7 +70,6 @@ public class Huffman {
         byte[] encoded = bout.toByteArray();
         
         byte[] result = new byte[1 + encoded.length];
-        
         result[0] = (byte) message.length();
         
         for (int i = 0; i < encoded.length; i++) {
@@ -103,7 +97,7 @@ public class Huffman {
 
     private void constructTrie(PriorityQueue<HuffNode> queue) {
         while (queue.size() >= 2) {
-            HuffNode newNode = new HuffNode('-', 0);
+            HuffNode newNode = new HuffNode((char) 0, 0);
 
             newNode.count += queue.peek().count;
             newNode.left = queue.poll();
