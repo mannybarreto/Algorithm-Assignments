@@ -37,6 +37,68 @@ public class Huffman {
     }
     
     
+    /*
+     * Core methods for Huffman creation, compression, and decompression.
+     */
+    
+    /**
+     * Takes the inputed String and counts the appearances of characters to create a PriorityQueue of
+     * HuffNodes and their # of appearances. Queue generally used for constructing the tree used for
+     * finding encodingMap.
+     * @param message String to be used 
+     * @return PriorityQueue<HuffNode> containing all characters and their number of appearances in message.
+     */
+    private PriorityQueue<HuffNode> createPriorityQueue(String message) {
+        HashMap<Character, Integer> distribution = new HashMap<>();
+        
+        for (int i = 0; i < message.length(); i++) {
+            char currentChar = message.charAt(i);
+            if (distribution.containsKey(currentChar)) {
+                distribution.put(currentChar, distribution.get(currentChar) + 1);
+            } else {
+                distribution.put(currentChar, 1);
+            }
+        }
+        
+        PriorityQueue<HuffNode> result = new PriorityQueue<HuffNode>();
+        
+        for (Entry<Character, Integer> entry : distribution.entrySet()) {
+            result.add(new HuffNode(entry.getKey(), entry.getValue()));
+        }
+        
+        return result;
+    }
+    
+    private void constructTrie(PriorityQueue<HuffNode> queue) {
+        while (queue.size() >= 2) {
+            HuffNode newNode = new HuffNode((char) 0, 0);
+
+            newNode.count += queue.peek().count;
+            newNode.left = queue.poll();
+            newNode.count += queue.peek().count;
+            newNode.right = queue.poll();
+
+            queue.add(newNode);
+        }
+        trieRoot = queue.poll();
+    }
+
+    private HashMap<Character, String> retrieveEncoding(HashMap<Character, String> encoding, HuffNode node, String path) {
+        if (node.isLeaf()) {
+            encoding.put(node.character, path);
+        }
+
+        if (node.left != null) {
+            encoding.putAll(retrieveEncoding(encoding, node.left, path + "0"));
+        }
+
+        if (node.right != null) {
+            encoding.putAll(retrieveEncoding(encoding, node.right, path + "1"));
+        }
+
+        return encoding;
+    }
+    
     // -----------------------------------------------
     // Compression
     // -----------------------------------------------
@@ -78,57 +140,7 @@ public class Huffman {
         
         return result;
     }
-
-    private HashMap<Character, String> retrieveEncoding(HashMap<Character, String> encoding, HuffNode node, String path) {
-        if (node.isLeaf()) {
-            encoding.put(node.character, path);
-        }
-
-        if (node.left != null) {
-            encoding.putAll(retrieveEncoding(encoding, node.left, path + "0"));
-        }
-
-        if (node.right != null) {
-            encoding.putAll(retrieveEncoding(encoding, node.right, path + "1"));
-        }
-
-        return encoding;
-    }
-
-    private void constructTrie(PriorityQueue<HuffNode> queue) {
-        while (queue.size() >= 2) {
-            HuffNode newNode = new HuffNode((char) 0, 0);
-
-            newNode.count += queue.peek().count;
-            newNode.left = queue.poll();
-            newNode.count += queue.peek().count;
-            newNode.right = queue.poll();
-
-            queue.add(newNode);
-        }
-        trieRoot = queue.poll();
-    }
-
-    private PriorityQueue<HuffNode> createPriorityQueue(String message) {
-        HashMap<Character, Integer> distribution = new HashMap<>();
-        
-        for (int i = 0; i < message.length(); i++) {
-            char currentChar = message.charAt(i);
-            if (distribution.containsKey(currentChar)) {
-                distribution.put(currentChar, distribution.get(currentChar) + 1);
-            } else {
-                distribution.put(currentChar, 1);
-            }
-        }
-
-        PriorityQueue<HuffNode> result = new PriorityQueue<HuffNode>();
-
-        for (Entry<Character, Integer> entry : distribution.entrySet()) {
-            result.add(new HuffNode(entry.getKey(), entry.getValue()));
-        }
-
-        return result;
-    }     
+     
     
     // -----------------------------------------------
     // Decompression
