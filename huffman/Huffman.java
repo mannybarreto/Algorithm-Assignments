@@ -33,7 +33,8 @@ public class Huffman {
     Huffman (String corpus) {
         PriorityQueue<HuffNode> queue = createPriorityQueue(corpus);
         constructTrie(queue);
-        encodingMap = retrieveEncoding(new HashMap<Character, String>() , trieRoot, "");
+        encodingMap = new HashMap<Character, String>();
+        retrieveEncoding(trieRoot, "");
     }
     
     
@@ -69,34 +70,36 @@ public class Huffman {
         return result;
     }
     
+    /**
+     * Takes queue formed from createPriorityQueue and creates Huffman Trie, 
+     * setting trieRoot to last element in queue.
+     * @param queue PriorityQueue formed by createPriorityQueue with HuffmanNodes of each character in message.
+     */
     private void constructTrie(PriorityQueue<HuffNode> queue) {
-        while (queue.size() >= 2) {
+        while (queue.size() > 1) {
             HuffNode newNode = new HuffNode((char) 0, 0);
 
-            newNode.count += queue.peek().count;
             newNode.left = queue.poll();
-            newNode.count += queue.peek().count;
             newNode.right = queue.poll();
+            newNode.count = newNode.left.count + newNode.right.count;
 
             queue.add(newNode);
         }
         trieRoot = queue.poll();
     }
 
-    private HashMap<Character, String> retrieveEncoding(HashMap<Character, String> encoding, HuffNode node, String path) {
+    private void retrieveEncoding(HuffNode node, String path) {
         if (node.isLeaf()) {
-            encoding.put(node.character, path);
+            encodingMap.put(node.character, path);
         }
 
         if (node.left != null) {
-            encoding.putAll(retrieveEncoding(encoding, node.left, path + "0"));
+            retrieveEncoding(node.left, path + "0");
         }
 
         if (node.right != null) {
-            encoding.putAll(retrieveEncoding(encoding, node.right, path + "1"));
+            retrieveEncoding(node.right, path + "1");
         }
-
-        return encoding;
     }
     
     // -----------------------------------------------
@@ -158,9 +161,24 @@ public class Huffman {
      * @return Decompressed String representation of the compressed bytecode message.
      */
     public String decompress (byte[] compressedMsg) {
-        throw new UnsupportedOperationException();
+        String decodedString = "";
+        HuffNode currentNode = trieRoot;
+        String sCompressedMsg = new String(compressedMsg); 
+        for(int i = 0; decodedString.length() < compressedMsg[0]; i++) {
+            if(currentNode.isLeaf() == true) {
+                decodedString += currentNode.character;
+                currentNode = trieRoot;
+            }
+            if( sCompressedMsg.charAt(i) == 1) {
+                currentNode = currentNode.right;
+            }
+            if( sCompressedMsg.charAt(i) == 0) {
+                currentNode = currentNode.left;
+            }
+        }
+        
+        return decodedString;
     }
-    
     
     // -----------------------------------------------
     // Huffman Trie
