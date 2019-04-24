@@ -1,7 +1,6 @@
 package huffman;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
@@ -119,21 +118,22 @@ public class Huffman {
      */
     public byte[] compress (String message) {
         String encodedString = "";
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(); 
         
         for (int i = 0; i < message.length(); i++) {
             encodedString = encodedString + encodingMap.get(message.charAt(i));
         }
         
-        // TODO: Switch to bitshift <<
         while (encodedString.length() % 8 != 0) {
             encodedString = encodedString + "0";
         }
+        
+        for (int i = 0; i < encodedString.length() / 8; i++) {
+            String currentByte = encodedString.substring(8 * i, 8 * (i + 1));
+            bout.write(Integer.parseInt(currentByte, 2));
+        }     
                 
-        ByteArrayOutputStream bout = new ByteArrayOutputStream(); 
-        bout.write(Integer.parseInt(encodedString, 2));
-        
         byte[] encoded = bout.toByteArray();
-        
         byte[] result = new byte[1 + encoded.length];
         result[0] = (byte) message.length();
         
