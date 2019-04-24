@@ -163,20 +163,34 @@ public class Huffman {
     public String decompress (byte[] compressedMsg) {
         String decodedString = "";
         HuffNode currentNode = trieRoot;
-        String sCompressedMsg = new String(compressedMsg); 
-        for(int i = 0; decodedString.length() < compressedMsg[0]; i++) {
-            if(currentNode.isLeaf() == true) {
+        String strCompressedMsg = "";
+        
+        for (int k = 1; k < compressedMsg.length; k++) {
+            String currentByte = "";
+            if (compressedMsg[k] < 0) {
+                currentByte = Integer.toBinaryString(compressedMsg[k]).substring(24);
+            } else {
+                currentByte = Integer.toBinaryString(compressedMsg[k]);
+            }
+   
+            while (currentByte.length() < 8) {
+                currentByte = "0" + currentByte;
+            }
+            
+            strCompressedMsg += currentByte;
+        }
+        
+        for (int i = 0; decodedString.length() < compressedMsg[0]; i++) {
+            if (currentNode.isLeaf() == true) {
                 decodedString += currentNode.character;
                 currentNode = trieRoot;
             }
-            if( sCompressedMsg.charAt(i) == 1) {
+            if (strCompressedMsg.charAt(i) == '1') {
                 currentNode = currentNode.right;
-            }
-            if( sCompressedMsg.charAt(i) == 0) {
+            } else {
                 currentNode = currentNode.left;
             }
         }
-        
         return decodedString;
     }
     
