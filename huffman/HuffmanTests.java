@@ -47,6 +47,24 @@ public class HuffmanTests {
         assertArrayEquals(compressed, h.compress("BABCBC"));
     }
     
+    @Test
+    public void comp_t4() {
+        Huffman h = new Huffman("DDDD");
+        // byte 0: 0000 0100
+        // byte 1: 0000 0000
+        byte[] compressed = {4, 0};
+        assertArrayEquals(compressed, h.compress("DDDD"));
+    }
+    
+    @Test
+    public void comp_t5() {
+        Huffman h = new Huffman("GAAAAEEEEEDDDFF");
+        // byte 0: 
+        // byte 1:
+        
+        byte[] compressed = {15, 85, 95, -8, 13, -128};
+        assertArrayEquals(compressed, h.compress("GAAAAEEEEEDDDFF"));
+    }
     
     // Decompression Tests
     // -----------------------------------------------

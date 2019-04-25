@@ -75,6 +75,12 @@ public class Huffman {
      * @param queue PriorityQueue formed by createPriorityQueue with HuffmanNodes of each character in message.
      */
     private void constructTrie(PriorityQueue<HuffNode> queue) {
+        if (queue.size() == 1) {
+            HuffNode newNode = new HuffNode((char) 0, queue.peek().count);
+            newNode.left = queue.poll();
+            queue.add(newNode);
+        }
+        
         while (queue.size() > 1) {
             HuffNode newNode = new HuffNode((char) 0, 0);
 
