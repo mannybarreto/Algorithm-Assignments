@@ -10,6 +10,9 @@ import java.io.ByteArrayOutputStream;
  * Huffman instances provide reusable Huffman Encoding Maps for
  * compressing and decompressing text corpi with comparable
  * distributions of characters.
+ * @author Manny Barreto
+ * @author Bennett Shingledecker
+ * @author Josh Patterson
  */
 public class Huffman {
     // -----------------------------------------------
