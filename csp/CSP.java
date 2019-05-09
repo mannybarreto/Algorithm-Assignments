@@ -2,7 +2,9 @@ package csp;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * CSP: Calendar Satisfaction Problem Solver
@@ -24,8 +26,12 @@ public class CSP {
      *         indexed by the variable they satisfy, or null if no solution exists.
      */
     public static List<LocalDate> solve (int nMeetings, LocalDate rangeStart, LocalDate rangeEnd, Set<DateConstraint> constraints) {
-        //throw new UnsupportedOperationException();
-        List<LocalDate> assignment = new List<LocaleDate>();
+        //List<DateVar> domains = new List<LocalDate>(nMeetings);
+
+        List<LocalDate> assignment = new ArrayList<LocalDate>();
+        initializeAssignment(assignment, nMeetings);
+        
+
         DateVar probDomain = new DateVar(rangeStart, rangeEnd);
         return backtrack(assignment, nMeetings, probDomain, constraints);
     }
@@ -36,30 +42,50 @@ public class CSP {
             return assignment;
         }
 
-        List<Integer> unassignedVars = getUnassaignedVars(assignment, nMeetings);
+        int unassignedVars = getUnassignedVar(assignment, nMeetings);
 
         for (LocalDate current = probDomain.rangeStart; current.isBefore(probDomain.rangeEnd); current = current.plusDays(1)) {
-            
+            assignment.add(unassignedVars, current);
+            if (checkAssignmentConsistency(assignment, constraints)) {
+                List<LocalDate> result = backtrack(assignment, nMeetings, probDomain, constraints);
+                if (checkAssignmentConsistency(result, constraints)) {
+                    return result;
+                }
+            }
+            assignment.remove(unassignedVars);
         }
 
         return null;
     }
+    
+//    public static nodeConsistency(){
+//        //if(domain value conflicts with unary constraint){
+//        //  remove it;
+//        //}
+//        
+//    }
 
 
     // Helper Methods / Classes
+    public static void initializeAssignment(List<LocalDate> assignment, int size) {
+        for(int i = 0; i < size; i++) {
+            assignment.add(null);
+        }
+    }
+
     /**
-     * Helper function that returns a list of variables that have yet to be assigned
-     * in the assignment list.
+     * Helper function that returns variable that has yet to be assigned
+     * in the assignment list by MRV
      * @param assignment List of assignments currently made
      * @param nMeetings number of meetings
      */
-    private static List<Integer> getUnassignedVars(List<LocalDate> assignment, int nMeetings) {
-        List<Integer> result = new List<Integer>();
+    private static int getUnassignedVar(List<LocalDate> assignment, int nMeetings) {
         for (int i = 0; i < nMeetings; i++) {
             if (assignment.get(i) == null) {
-                result.add(i);
+                return i;
             }
         }
+        return 0;
     }
 
     public static class DateVar {
@@ -72,6 +98,13 @@ public class CSP {
         }
     }
 
+    /**
+     * Checks if two dates pass a constrant. leftDate constraint rightDate == true?
+     * @param leftDate
+     * @param rightDate
+     * @param constraint
+     * @return boolean of whether or not the two dates pass
+     */
     public static boolean checkConsistency (LocalDate leftDate, LocalDate rightDate, DateConstraint constraint) {
         boolean isConsistent = false;
         switch (constraint.OP) {
@@ -85,4 +118,31 @@ public class CSP {
         
         return isConsistent;
     }
+    public static boolean checkAssignmentConsistency(List<LocalDate> assignment, Set<DateConstraint> constraints){
+        //check if unary or binary
+        //use checkConsistency
+        //go through all constraints
+        boolean isConsistent = true;
+        for (DateConstraint constraint : constraints){
+            if (constraint.arity() == 2) {
+                BinaryDateConstraint castedConstraint = (BinaryDateConstraint) constraint;
+                if (assignment.get(castedConstraint.L_VAL) == null || assignment.get(castedConstraint.L_VAL) == null) {
+                    break;
+                } else {
+                    checkConsistency(assignment.get(castedConstraint.L_VAL), assignment.get(castedConstraint.R_VAL), constraint);
+                }
+            } else {
+                UnaryDateConstraint castedConstraint = (UnaryDateConstraint) constraint;
+                if (assignment.get(castedConstraint.L_VAL) == null) {
+                    break;
+                } else {
+                    checkConsistency(assignment.get(castedConstraint.L_VAL), castedConstraint.R_VAL, constraint);
+                }
+            }
+            
+        }
+        return isConsistent;
+    }
+
+    
 }
