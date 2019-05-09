@@ -58,12 +58,15 @@ public class CSP {
         return null;
     }
     
-//    public static nodeConsistency(){
+    public static nodeConsistency(){
 //        //if(domain value conflicts with unary constraint){
 //        //  remove it;
 //        //}
-//        
-//    }
+        for(int i = 0; i < variables.size(); i++){
+            
+        }
+
+    }
 
 
     // Helper Methods / Classes
