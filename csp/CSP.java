@@ -26,7 +26,14 @@ public class CSP {
      *         indexed by the variable they satisfy, or null if no solution exists.
      */
     public static List<LocalDate> solve (int nMeetings, LocalDate rangeStart, LocalDate rangeEnd, Set<DateConstraint> constraints) {
-        //List<DateVar> domains = new List<LocalDate>(nMeetings);
+        List<DateVar> domains = new ArrayList<LocalDate>(nMeetings);
+        initializeDomains(domains, nMeetings, rangeStart, rangeEnd);
+        
+        for (DateConstraint constraint : constraints) {
+            if (constraint.arity() == 1) {
+                nodeConsistency(constraint, domains);
+            }
+        }
 
         List<LocalDate> assignment = new ArrayList<LocalDate>();
         initializeAssignment(assignment, nMeetings);
@@ -36,7 +43,6 @@ public class CSP {
         return backtrack(assignment, nMeetings, probDomain, constraints);
     }
 
-    // TODO FIX NULLPOINTEREXCEPTIONS
     private static List<LocalDate> backtrack(List<LocalDate> assignment, int nMeetings, DateVar probDomain, Set<DateConstraint> constraints) {
         if (!assignment.contains(null)) {
             return assignment;
@@ -67,7 +73,7 @@ public class CSP {
     //                 remove variables.get(i).domain.get(q);
     //             }
     //         }
-    //     }s
+    //     }
     // }
 
 
@@ -75,6 +81,16 @@ public class CSP {
     public static void initializeAssignment(List<LocalDate> assignment, int size) {
         for (int i = 0; i < size; i++) {
             assignment.add(null);
+        }
+    }
+
+    public static void initializeDomains(List<DateVar> domains, int size, LocalDate rangeStart, LocalDate rangeEnd) {
+        for (int i = 0; i < size; i++) {
+            List<LocalDate> newDomain = new ArrayList<LocalDate>();
+            for (LocalDate currentDate = probDomain.rangeStart; currentDate.isBefore(probDomain.rangeEnd) || currentDate.isEqual(probDomain.rangeEnd); currentDate = currentDate.plusDays(1)) {
+                newDomain.add(currentDate);
+            }   
+            domains.add(new DateVar(newDomain));
         }
     }
 
@@ -94,12 +110,10 @@ public class CSP {
     }
 
     public static class DateVar {
-        LocalDate rangeStart;
-        LocalDate rangeEnd;
+        List<LocalDate> domain;
 
-        public DateVar (LocalDate rangeStart, LocalDate rangeEnd) {
-            this.rangeStart = rangeStart;
-            this.rangeEnd = rangeEnd;
+        public DateVar (List<LocalDate> domain) {
+            this.domain = domain;
         }
     }
 
