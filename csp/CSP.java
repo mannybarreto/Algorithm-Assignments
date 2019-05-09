@@ -38,40 +38,42 @@ public class CSP {
 
     // TODO
     private static List<LocalDate> backtrack(List<LocalDate> assignment, int nMeetings, DateVar probDomain, Set<DateConstraint> constraints) {
-        if (assignment.size() == nMeetings) {
+        if (!assignment.contains(null)) {
             return assignment;
         }
 
-        int unassignedVars = getUnassignedVar(assignment, nMeetings);
+        int unassignedVarIndex = getUnassignedVar(assignment, nMeetings);
 
-        for (LocalDate current = probDomain.rangeStart; current.isBefore(probDomain.rangeEnd); current = current.plusDays(1)) {
-            assignment.add(unassignedVars, current);
+        for (LocalDate currentDate = probDomain.rangeStart; currentDate.isBefore(probDomain.rangeEnd); currentDate = currentDate.plusDays(1)) {
+            assignment.set(unassignedVarIndex, currentDate);
+            
             if (checkAssignmentConsistency(assignment, constraints)) {
                 List<LocalDate> result = backtrack(assignment, nMeetings, probDomain, constraints);
-                if (checkAssignmentConsistency(result, constraints)) {
+                if (result != null) {
                     return result;
                 }
             }
-            assignment.remove(unassignedVars);
+            
+            assignment.set(unassignedVarIndex, null);
         }
 
         return null;
     }
     
-    public static nodeConsistency(){
-//        //if(domain value conflicts with unary constraint){
-//        //  remove it;
-//        //}
-        for(int i = 0; i < variables.size(); i++){
-            
-        }
-
-    }
+    // public static nodeConsistency(){
+    //     for(int i = 0; i < variables.size(); i++){
+    //         for(int q = 0; q < variables.get(i).domain.size(); q++){
+    //             if(variables.get(i).domain.get(q) conflicts with unary constraint){
+    //                 remove variables.get(i).domain.get(q);
+    //             }
+    //         }
+    //     }s
+    // }
 
 
     // Helper Methods / Classes
     public static void initializeAssignment(List<LocalDate> assignment, int size) {
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             assignment.add(null);
         }
     }
@@ -122,29 +124,25 @@ public class CSP {
         return isConsistent;
     }
     public static boolean checkAssignmentConsistency(List<LocalDate> assignment, Set<DateConstraint> constraints){
-        //check if unary or binary
-        //use checkConsistency
-        //go through all constraints
-        boolean isConsistent = true;
         for (DateConstraint constraint : constraints){
             if (constraint.arity() == 2) {
                 BinaryDateConstraint castedConstraint = (BinaryDateConstraint) constraint;
-                if (assignment.get(castedConstraint.L_VAL) == null || assignment.get(castedConstraint.L_VAL) == null) {
-                    break;
-                } else {
-                    checkConsistency(assignment.get(castedConstraint.L_VAL), assignment.get(castedConstraint.R_VAL), constraint);
-                }
+                if (assignment.get(castedConstraint.L_VAL) != null && assignment.get(castedConstraint.R_VAL) != null) {
+                    if (!checkConsistency(assignment.get(castedConstraint.L_VAL), assignment.get(castedConstraint.R_VAL), constraint)) {
+                        return false;
+                    }
+                } 
             } else {
                 UnaryDateConstraint castedConstraint = (UnaryDateConstraint) constraint;
-                if (assignment.get(castedConstraint.L_VAL) == null) {
-                    break;
-                } else {
-                    checkConsistency(assignment.get(castedConstraint.L_VAL), castedConstraint.R_VAL, constraint);
+                if (assignment.get(castedConstraint.L_VAL) != null) {
+                    if (!checkConsistency(assignment.get(castedConstraint.L_VAL), castedConstraint.R_VAL, constraint)) {
+                        return false;
+                    }
                 }
             }
             
         }
-        return isConsistent;
+        return true;
     }
 
     
