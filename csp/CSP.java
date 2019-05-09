@@ -36,7 +36,7 @@ public class CSP {
         return backtrack(assignment, nMeetings, probDomain, constraints);
     }
 
-    // TODO
+    // TODO FIX NULLPOINTEREXCEPTIONS
     private static List<LocalDate> backtrack(List<LocalDate> assignment, int nMeetings, DateVar probDomain, Set<DateConstraint> constraints) {
         if (!assignment.contains(null)) {
             return assignment;
@@ -44,7 +44,7 @@ public class CSP {
 
         int unassignedVarIndex = getUnassignedVar(assignment, nMeetings);
 
-        for (LocalDate currentDate = probDomain.rangeStart; currentDate.isBefore(probDomain.rangeEnd); currentDate = currentDate.plusDays(1)) {
+        for (LocalDate currentDate = probDomain.rangeStart; currentDate.isBefore(probDomain.rangeEnd) || currentDate.isEqual(probDomain.rangeEnd); currentDate = currentDate.plusDays(1)) {
             assignment.set(unassignedVarIndex, currentDate);
             
             if (checkAssignmentConsistency(assignment, constraints)) {
@@ -123,6 +123,7 @@ public class CSP {
         
         return isConsistent;
     }
+    
     public static boolean checkAssignmentConsistency(List<LocalDate> assignment, Set<DateConstraint> constraints){
         for (DateConstraint constraint : constraints){
             if (constraint.arity() == 2) {
