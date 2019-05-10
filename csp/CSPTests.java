@@ -21,8 +21,8 @@ public class CSPTests {
     // constraint propagation is working...
     // If they are, 5 seconds should be more than enough
     // for any test
-    @Rule
-    public Timeout globalTimeout = Timeout.seconds(5);
+//    @Rule
+//    public Timeout globalTimeout = Timeout.seconds(5);
     
     /**
      * Tests whether a given solution to a CSP satisfies all constraints or not
