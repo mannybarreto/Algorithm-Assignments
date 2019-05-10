@@ -13,6 +13,9 @@ import java.util.Queue;
  * Provides a solution for scheduling some n meetings in a given
  * period of time and according to some unary and binary constraints
  * on the dates of each meeting.
+ * @author Manny Barreto
+ * @author Bennett Shingledecker
+ * @author Andrew Forney
  */
 public class CSP {
 
